@@ -1,0 +1,26 @@
+{
+    "name" : "personaAssistant",
+    "title" : "Persona Assistant",
+    "description" : "jQuery plugin to help with performing common Persona tasks.",
+
+    "version" : "0.1.0",
+    "dependencies" : {
+        "jquery" : ">=1.4"
+    },
+    "keywords" : [ "persona", "browser-id", "sso", "sign-in" ],
+   
+    "homepage" : "https://github.com/chilts/jquery.pesonaAssistant/",
+    "docs" : "https://github.com/chilts/jquery.pesonaAssistant/",
+    "demo" : "http://persona-assistant.chilts.org/",
+    "download" : "https://github.com/chilts/jquery.pesonaAssistant/zipball/0.1.0",
+    "bugs" : "https://github.com/chilts/jquery.pesonaAssistant/issues",
+
+    "author" : {
+        "name" : "Andrew Chilton",
+        "url" : "https://github.com/chilts/jquery.personaAssistant.js"
+    },
+    "licenses" : {
+        "type" : "MIT",
+        "url" : "http://chilts.mit-license.org/2013/"
+    }
+}
