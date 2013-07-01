@@ -5,19 +5,19 @@
 
     "version" : "0.1.0",
     "dependencies" : {
-        "jquery" : ">=1.4"
+        "jquery" : ">= 1.4"
     },
-    "keywords" : [ "persona", "browser-id", "sso", "sign-in" ],
+    "keywords" : [ "persona", "browser-id", "sign-in" ],
    
-    "homepage" : "https://github.com/chilts/jquery.pesonaAssistant/",
-    "docs" : "https://github.com/chilts/jquery.pesonaAssistant/",
+    "homepage" : "http://persona-assistant.chilts.org/",
+    "docs" : "https://github.com/chilts/jquery.persona-assistant.js/",
     "demo" : "http://persona-assistant.chilts.org/",
-    "download" : "https://github.com/chilts/jquery.pesonaAssistant/zipball/0.1.0",
-    "bugs" : "https://github.com/chilts/jquery.pesonaAssistant/issues",
+    "download" : "https://github.com/chilts/jquery.persona-assistant.js/archive/master.zip",
+    "bugs" : "https://github.com/chilts/jquery.persona-assistant.js/issues",
 
     "author" : {
         "name" : "Andrew Chilton",
-        "url" : "https://github.com/chilts/jquery.personaAssistant.js"
+        "url" : "https://github.com/chilts/jquery.persona-assistant.js/"
     },
     "licenses" : {
         "type" : "MIT",
