@@ -14,14 +14,29 @@
     var commands = {
 
         'init' : function(options) {
-            var $body = this;
+            var $body = $('body');
             if ( $body.size() === 0 || $body.size() > 1 ) {
                 console.log('The matching element set for personaAssistant should be of length one');
                 return;
             }
 
-            // create and store the 'opts' data on the element
-            var opts = $.extend({}, $.fn.personaAssistant.defaults, options);
+            // create the opts from:
+            // 1) nothing (ie. {})
+            // 2) the 'classic' or 'application' mode (or nothing)
+            // 3) finally, the options passed in
+            var opts = $.extend({}, $.personaAssistant.defaults);
+            if ( options.mode === 'classic' ) {
+                opts = $.extend(opts, $.personaAssistant.classic);
+            }
+            else if ( options.mode === 'application' ) {
+                opts = $.extend(opts, $.personaAssistant.application);
+            }
+            else {
+                // unknown mode, so we won't extend 'opts' and presume the user knows what they are doing
+            }
+            opts = $.extend(opts, options);
+
+            // store these opts onto the body
             $body.data('opts', opts);
 
             // get the user - if it's the empty string, set it to be null which is more appropriate
@@ -90,22 +105,30 @@
                         type: 'POST',
                         url: opts.loginJsonUrl,
                         data: { assertion : assertion },
-                        success: function(res, status, xhr) {
-                            console.log(res);
+                        success: function(result, status, xhr) {
+                            console.log(result);
 
                             // store the email address on $body
-                            $body.data('email', res.email);
+                            $body.data('email', result.email);
 
                             // ... and show it on the page (if opts.storeEmailSelector matches any element)
-                            $(opts.storeEmailSelector).text(res.email);
+                            $(opts.storeEmailSelector).text(result.email);
 
                             // redirect or show depending on the mode
                             if ( opts.mode === 'classic' ) {
-                                window.location.reload(true);
+                                if ( opts.setLocationAfterLogin ) {
+                                    window.location = opts.setLocationAfterLogin;
+                                }
+                                else {
+                                    window.location.reload(true);
+                                }
+                            }
+                            else if ( opts.mode === 'application' ) {
+                                showLoggedIn();
+                                opts.onLogin(result);
                             }
                             else {
-                                showLoggedIn();
-                                opts.onLogin(res);
+                                // unknown mode
                             }
                         },
                         error: function(xhr, status, err) {
@@ -146,7 +169,7 @@
     };
 
     // plugin 'personaAssistant'
-    $.fn.personaAssistant = function(command, options) {
+    $.personaAssistant = function(command, options) {
 
         // Method calling logic
         if ( commands[command] ) {
@@ -160,9 +183,8 @@
     }
 
     // plugin defaults
-    $.fn.personaAssistant.defaults = {
-        // default mode is 'classic' (out of 'classic' and 'application')
-        mode               : 'classic',
+    $.personaAssistant.defaults = {
+        mode : 'classic',
 
         // queries to show/hide elements at the appropriate time
         loggedInSelector   : '.persona-logged-in',
@@ -174,23 +196,36 @@
         logoutBtn          : '.persona-logout',
 
         // where to set the email we received back (optional)
-        storeEmailSelector : '.persona-email',
+        storeEmailSelector : '.persona-email'
+    };
 
+    // defaults - classic
+    $.personaAssistant.classic = {
+        // urls we should hit at various times
+        loginJsonUrl       : '/login.json',
+        logoutUrl          : '/logout',
+        logoutJsonUrl      : '/logout.json'
+
+        // --- options for 'classic' mode ---
+
+    };
+
+    // defaults - application
+    $.personaAssistant.application = {
         // urls we should hit at various times
         loginJsonUrl       : '/login.json',
         logoutUrl          : '/logout',
         logoutJsonUrl      : '/logout.json',
 
-        // --- options for 'classic' mode ---
-
         // --- options for 'application' mode ---
+
         // queries to remove elements from the page when logged out (application
         onLogoutRemoveSelector : '.persona-logout-remove',
+
         // events you can listen on so you can do something else appropriate
-        onLogin                : function(user) {},
+        onLogin                : function(result) {},
         onLogout               : function() {},
         onLoading              : function() {}
-
     };
 
 })(jQuery);
