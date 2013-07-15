@@ -72,7 +72,7 @@
             }
 
             // when someone clicks the login button, request Persona to authenticate the user
-            $(opts.loginBtn).click(function(ev) {
+            $(opts.loginBtnSelector).click(function(ev) {
                 ev.preventDefault();
                 showLoading();
                 console.log('Clicked login ...');
@@ -80,7 +80,7 @@
             });
 
             // when someone clicks the logout button, tell Persona to logout
-            $(opts.logoutBtn).click(function(ev) {
+            $(opts.logoutBtnSelector).click(function(ev) {
                 ev.preventDefault();
                 console.log('Clicked logout ...');
 
@@ -111,8 +111,8 @@
                             // store the email address on $body
                             $body.data('email', result.email);
 
-                            // ... and show it on the page (if opts.storeEmailSelector matches any element)
-                            $(opts.storeEmailSelector).text(result.email);
+                            // ... and show it on the page (if opts.showEmailSelector matches any element)
+                            $(opts.showEmailSelector).text(result.email);
 
                             // redirect or show depending on the mode
                             if ( opts.mode === 'classic' ) {
@@ -140,8 +140,13 @@
                     console.log('match(): entry');
                 },
                 onlogout : function() {
-                    // A user has logged out! Here you need to:
-                    // Tear down the user's session by redirecting the user or making a call to your backend.
+                    // A user has logged out! Here you need to tear down the session by:
+                    //
+                    // 1) send the user to another page (which tears down the session on the server)
+                    // 2) hit an Ajax URL on the server (which also tears down their session)
+                    //
+                    // N.B. You see the pattern! :)
+                    //
                     console.log('onlogout(): entry');
 
                     // wipe the email that we think is logged in
@@ -150,15 +155,35 @@
                     if ( opts.mode === 'classic' ) {
                         window.location = opts.logoutUrl;
                     }
+                    else if ( opts.mode === 'application' ) {
+                        // hit the logoutJsonUrl, to tear down the local session
+                        $.ajax({
+                            type: 'POST',
+                            url: opts.logoutJsonUrl,
+                            success: function(result, status, xhr) {
+                                console.log(result);
+
+                                // if the email address is on the page, make it blank
+                                $(opts.showEmailSelector).text('');
+
+                                // remove any elements that shouldn't be on the page any longer
+                                $(opts.onLogoutDeleteSelector).remove();
+
+                                // show any element we should show when logged out
+                                showLoggedOut();
+
+                                // finally, call the listener
+                                opts.onLogout();
+                            },
+                            error: function(xhr, status, err) {
+                                // What to do here ... ??? Try and logout using the regular logout.
+                                window.location = opts.logoutUrl;
+                            }
+                        });
+                    }
                     else {
-                        showLoggedOut();
-                        $(opts.onLogoutDeleteSelector).remove();
-
-                        // if this is still on the page, make it blank
-                        $(opts.storeEmailSelector).text('');
-
-                        // finally, call the listener
-                        opts.onLogout();
+                        // default to setting the location to the logoutUrl
+                        window.location = opts.logoutUrl;
                     }
                 }
             });
@@ -184,40 +209,37 @@
 
     // plugin defaults
     $.personaAssistant.defaults = {
-        mode : 'classic',
+        mode                   : 'classic',
 
         // queries to show/hide elements at the appropriate time
-        loggedInSelector   : '.persona-logged-in',
-        loadingSelector    : '.persona-loading',
-        loggedOutSelector  : '.persona-logged-out',
+        loggedInSelector       : '.persona-logged-in',
+        loadingSelector        : '.persona-loading',
+        loggedOutSelector      : '.persona-logged-out',
 
         // buttons to log in/out
-        loginBtn           : '.persona-login',
-        logoutBtn          : '.persona-logout',
+        loginBtnSelector       : '.persona-login',
+        logoutBtnSelector      : '.persona-logout',
 
         // where to set the email we received back (optional)
-        storeEmailSelector : '.persona-email'
+        showEmailSelector      : '.persona-email',
+
+        // urls we should hit at various times
+        loginJsonUrl           : '/login.json',
+        logoutUrl              : '/logout'
     };
 
     // defaults - classic
     $.personaAssistant.classic = {
-        // urls we should hit at various times
-        loginJsonUrl       : '/login.json',
-        logoutUrl          : '/logout',
-        logoutJsonUrl      : '/logout.json'
-
-        // --- options for 'classic' mode ---
-
+        // Nothing over and above the regular defaults.
+        //
+        // Note: we don't listen to any events, since we will usually
+        // do a complete page load on login/logout.
     };
 
     // defaults - application
     $.personaAssistant.application = {
         // urls we should hit at various times
-        loginJsonUrl       : '/login.json',
-        logoutUrl          : '/logout',
-        logoutJsonUrl      : '/logout.json',
-
-        // --- options for 'application' mode ---
+        logoutJsonUrl          : '/logout.json',
 
         // queries to remove elements from the page when logged out (application
         onLogoutRemoveSelector : '.persona-logout-remove',
