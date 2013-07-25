@@ -107,7 +107,12 @@
                         url: opts.loginJsonUrl,
                         data: { assertion : assertion },
                         success: function(result, status, xhr) {
-                            console.log(result);
+                            // if the result was not ok
+                            if ( !result.ok ) {
+                                // perhaps have an element (.persona-err) where we show errors?
+                                showLoggedOut();
+                                return;
+                            }
 
                             // store the email address on $body
                             $body.data('email', result.email);
