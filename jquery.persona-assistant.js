@@ -55,6 +55,7 @@
                 $(opts.loggedInSelector).hide();
                 $(opts.loadingSelector).show();
                 $(opts.loggedOutSelector).hide();
+                opts.onLoading();
             }
             function showLoggedOut() {
                 console.log('showLoggedOut() : entry');
@@ -74,8 +75,8 @@
             // when someone clicks the login button, request Persona to authenticate the user
             $(opts.loginBtnSelector).click(function(ev) {
                 ev.preventDefault();
-                showLoading();
                 console.log('Clicked login ...');
+                showLoading();
                 navigator.id.request();
             });
 
