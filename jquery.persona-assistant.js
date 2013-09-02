@@ -241,7 +241,10 @@
 
         // urls we should hit at various times
         loginJsonUrl           : '/login.json',
-        logoutUrl              : '/logout'
+        logoutUrl              : '/logout',
+
+        // events you can listen on so you can do other things
+        onLoading              : function() {}
     };
 
     // defaults - classic
@@ -262,8 +265,7 @@
 
         // events you can listen on so you can do something else appropriate
         onLogin                : function(result) {},
-        onLogout               : function() {},
-        onLoading              : function() {}
+        onLogout               : function() {}
     };
 
 })(jQuery);
