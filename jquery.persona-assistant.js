@@ -262,7 +262,7 @@
             $.error( 'Command ' +  command + ' does not exist on jQuery.personaAssistant' );
         }
 
-    }
+    };
 
     // plugin defaults
     $.personaAssistant.defaults = {
