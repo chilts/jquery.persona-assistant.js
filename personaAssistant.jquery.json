@@ -12,7 +12,7 @@
     "homepage" : "http://persona-assistant.chilts.org/",
     "docs" : "https://github.com/chilts/jquery.persona-assistant.js/",
     "demo" : "http://persona-assistant.chilts.org/",
-    "download" : "https://github.com/chilts/jquery.persona-assistant.js/archive/master.zip",
+    "download" : "https://github.com/chilts/jquery.persona-assistant.js/releases",
     "bugs" : "https://github.com/chilts/jquery.persona-assistant.js/issues",
 
     "author" : {
