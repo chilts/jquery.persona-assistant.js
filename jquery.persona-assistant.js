@@ -2,7 +2,9 @@
 //
 // jquery.persona-assistant.js
 //
-// Copyright (c) Andrew Chilton 2013 - http://chilts.org/blog/
+// Copyright (c) Mozilla 2013
+//
+// Written by Andrew Chilton <chilts@mozilla.com> (@andychilton)
 //
 // License - http://chilts.mit-license.org/2013/
 //
