@@ -89,6 +89,15 @@
                 navigator.id.logout();
             });
 
+            // when someone clicks the 'add' button, get a new email address and add it to the server
+            $(opts.addBtnSelector).click(function(ev) {
+                ev.preventDefault();
+                console.log("Clicked 'Add Email' ...");
+
+                // see what happens here
+                navigator.id.request();
+            });
+
             // now, call the navigator.id.watch() so we can see what is going on
             navigator.id.watch({
                 loggedInUser : user,
@@ -222,9 +231,10 @@
         loadingSelector        : '.persona-loading',
         loggedOutSelector      : '.persona-logged-out',
 
-        // buttons to log in/out
+        // buttons to log in/out, add an email address
         loginBtnSelector       : '.persona-login',
         logoutBtnSelector      : '.persona-logout',
+        addBtnSelector         : '.persona-add',
 
         // where to set the email we received back (optional)
         showEmailSelector      : '.persona-email',
