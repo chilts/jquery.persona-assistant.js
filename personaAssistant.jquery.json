@@ -3,7 +3,7 @@
     "title" : "Persona Assistant",
     "description" : "jQuery plugin to help with performing common Persona tasks.",
 
-    "version" : "0.1.1",
+    "version" : "0.1.2",
     "dependencies" : {
         "jquery" : ">= 1.4"
     },
