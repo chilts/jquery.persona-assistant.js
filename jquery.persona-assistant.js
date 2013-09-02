@@ -12,6 +12,25 @@
 
 (function($) {
 
+    // See https://developer.mozilla.org/en-US/docs/Web/API/navigator.id.request
+    // Note: ignoring returnTo.
+    var requestParams = ['backgroundColor', 'privacyPolicy', 'siteLogo', 'siteName', 'termsOfService'];
+
+    // takes the options, loops through the requestParams, sets any passed in and returns it
+    function makeRequestParams(opts) {
+        var params = {};
+        for ( var i = 0, paramName; i < requestParams.length; i++ ) {
+            paramName = requestParams[i];
+            console.log(paramName);
+            if ( opts[paramName] ) {
+                console.log('* ' + opts[paramName]);
+                params[paramName] = opts[paramName];
+            }
+        }
+        console.log(params);
+        return params;
+    }
+
     // create all of our command functions
     var commands = {
 
@@ -79,7 +98,11 @@
                 ev.preventDefault();
                 console.log('Clicked login ...');
                 showLoading();
-                navigator.id.request();
+
+                // request an email address
+                var params = makeRequestParams(opts);
+                params.oncancel = oncancel;
+                navigator.id.request(params);
             });
 
             // when someone clicks the logout button, tell Persona to logout
@@ -96,8 +119,10 @@
                 ev.preventDefault();
                 console.log("Clicked 'Add Email' ...");
 
-                // see what happens here
-                navigator.id.request();
+                // request another email address
+                var params = makeRequestParams(opts);
+                params.oncancel = oncancel;
+                navigator.id.request(params);
             });
 
             // --- functions ---
@@ -156,6 +181,12 @@
                 console.log('match(): entry');
             }
 
+            function oncancel() {
+                console.log('oncancel(): entry');
+                // this request was cancelled so let's tidy up
+                showLoggedOut();
+            }
+
             function onlogout() {
                 // A user has logged out! Here you need to tear down the session by:
                 //
@@ -204,17 +235,13 @@
                 }
             }
 
-            // TODO: Move the functions to be separate, then we can do nicer things with the
-            // watch options if thing are or aren't specified.
-            var watch = {
+            // finally, watch what is going on
+            navigator.id.watch({
                 loggedInUser : user,
                 onlogin      : onlogin,
                 match        : match,
-                onlogout     : onlogout,
-            };
-
-            // now, call the navigator.id.watch() so we can see what is going on
-            navigator.id.watch(watch);
+                onlogout     : onlogout
+            });
 
             // return this for chained jQuery calls
             return this;
