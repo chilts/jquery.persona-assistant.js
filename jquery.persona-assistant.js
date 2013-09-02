@@ -100,111 +100,123 @@
                 navigator.id.request();
             });
 
-            // now, call the navigator.id.watch() so we can see what is going on
-            navigator.id.watch({
-                loggedInUser : user,
-                onlogin : function(assertion) {
-                    // A user has logged in! Here you need to:
-                    // 1. Send the assertion to your backend for verification and to create a session.
-                    // 2. Update your UI.
-                    console.log('onlogin(): entry');
+            // --- functions ---
+            function onlogin(assertion) {
+                // A user has logged in! Here you need to:
+                // 1. Send the assertion to your backend for verification and to create a session.
+                // 2. Update your UI.
+                console.log('onlogin(): entry');
 
-                    // show only the loading elements
-                    showLoading();
+                // show only the loading elements
+                showLoading();
 
-                    console.log('*** calling POST ' + opts.loginJsonUrl + ' ***');
-                    $.ajax({
-                        type: 'POST',
-                        url: opts.loginJsonUrl,
-                        data: { assertion : assertion },
-                        success: function(result, status, xhr) {
-                            // if the result was not ok
-                            if ( !result.ok ) {
-                                // perhaps have an element (.persona-err) where we show errors?
-                                showLoggedOut();
-                                return;
-                            }
+                console.log('*** calling POST ' + opts.loginJsonUrl + ' ***');
+                $.ajax({
+                    type: 'POST',
+                    url: opts.loginJsonUrl,
+                    data: { assertion : assertion },
+                    success: function(result, status, xhr) {
+                        // if the result was not ok
+                        if ( !result.ok ) {
+                            // perhaps have an element (.persona-err) where we show errors?
+                            showLoggedOut();
+                            return;
+                        }
 
-                            // store the email address on $body
-                            $body.data('email', result.email);
+                        // store the email address on $body
+                        $body.data('email', result.email);
 
-                            // ... and show it on the page (if opts.showEmailSelector matches any element)
-                            $(opts.showEmailSelector).text(result.email);
+                        // ... and show it on the page (if opts.showEmailSelector matches any element)
+                        $(opts.showEmailSelector).text(result.email);
 
-                            // redirect or show depending on the mode
-                            if ( opts.mode === 'classic' ) {
-                                if ( opts.setLocationAfterLogin ) {
-                                    window.location = opts.setLocationAfterLogin;
-                                }
-                                else {
-                                    window.location.reload(true);
-                                }
-                            }
-                            else if ( opts.mode === 'application' ) {
-                                showLoggedIn();
-                                opts.onLogin(result);
+                        // redirect or show depending on the mode
+                        if ( opts.mode === 'classic' ) {
+                            if ( opts.setLocationAfterLogin ) {
+                                window.location = opts.setLocationAfterLogin;
                             }
                             else {
-                                // unknown mode
+                                window.location.reload(true);
                             }
+                        }
+                        else if ( opts.mode === 'application' ) {
+                            showLoggedIn();
+                            opts.onLogin(result);
+                        }
+                        else {
+                            // unknown mode
+                        }
+                    },
+                    error: function(xhr, status, err) {
+                        navigator.id.logout();
+                    }
+                });
+            }
+
+            function match() {
+                console.log('match(): entry');
+            }
+
+            function onlogout() {
+                // A user has logged out! Here you need to tear down the session by:
+                //
+                // 1) send the user to another page (which tears down the session on the server)
+                // 2) hit an Ajax URL on the server (which also tears down their session)
+                //
+                // N.B. You see the pattern! :)
+                //
+                console.log('onlogout(): entry');
+
+                // wipe the email that we think is logged in
+                $body.data('email', '');
+
+                if ( opts.mode === 'classic' ) {
+                    window.location = opts.logoutUrl;
+                }
+                else if ( opts.mode === 'application' ) {
+                    // hit the logoutJsonUrl, to tear down the local session
+                    $.ajax({
+                        type: 'POST',
+                        url: opts.logoutJsonUrl,
+                        success: function(result, status, xhr) {
+                            console.log(result);
+
+                            // if the email address is on the page, make it blank
+                            $(opts.showEmailSelector).text('');
+
+                            // remove any elements that shouldn't be on the page any longer
+                            $(opts.onLogoutDeleteSelector).remove();
+
+                            // show any element we should show when logged out
+                            showLoggedOut();
+
+                            // finally, call the listener
+                            opts.onLogout();
                         },
                         error: function(xhr, status, err) {
-                            navigator.id.logout();
+                            // What to do here ... ??? Try and logout using the regular logout.
+                            window.location = opts.logoutUrl;
                         }
                     });
-                },
-                match : function() {
-                    console.log('match(): entry');
-                },
-                onlogout : function() {
-                    // A user has logged out! Here you need to tear down the session by:
-                    //
-                    // 1) send the user to another page (which tears down the session on the server)
-                    // 2) hit an Ajax URL on the server (which also tears down their session)
-                    //
-                    // N.B. You see the pattern! :)
-                    //
-                    console.log('onlogout(): entry');
-
-                    // wipe the email that we think is logged in
-                    $body.data('email', '');
-
-                    if ( opts.mode === 'classic' ) {
-                        window.location = opts.logoutUrl;
-                    }
-                    else if ( opts.mode === 'application' ) {
-                        // hit the logoutJsonUrl, to tear down the local session
-                        $.ajax({
-                            type: 'POST',
-                            url: opts.logoutJsonUrl,
-                            success: function(result, status, xhr) {
-                                console.log(result);
-
-                                // if the email address is on the page, make it blank
-                                $(opts.showEmailSelector).text('');
-
-                                // remove any elements that shouldn't be on the page any longer
-                                $(opts.onLogoutDeleteSelector).remove();
-
-                                // show any element we should show when logged out
-                                showLoggedOut();
-
-                                // finally, call the listener
-                                opts.onLogout();
-                            },
-                            error: function(xhr, status, err) {
-                                // What to do here ... ??? Try and logout using the regular logout.
-                                window.location = opts.logoutUrl;
-                            }
-                        });
-                    }
-                    else {
-                        // default to setting the location to the logoutUrl
-                        window.location = opts.logoutUrl;
-                    }
                 }
-            });
+                else {
+                    // default to setting the location to the logoutUrl
+                    window.location = opts.logoutUrl;
+                }
+            }
 
+            // TODO: Move the functions to be separate, then we can do nicer things with the
+            // watch options if thing are or aren't specified.
+            var watch = {
+                loggedInUser : user,
+                onlogin      : onlogin,
+                match        : match,
+                onlogout     : onlogout,
+            };
+
+            // now, call the navigator.id.watch() so we can see what is going on
+            navigator.id.watch(watch);
+
+            // return this for chained jQuery calls
             return this;
         }
 
