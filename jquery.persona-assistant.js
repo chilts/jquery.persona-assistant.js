@@ -14,7 +14,7 @@
 
     // See https://developer.mozilla.org/en-US/docs/Web/API/navigator.id.request
     // Note: ignoring returnTo.
-    var requestParams = ['backgroundColor', 'privacyPolicy', 'siteLogo', 'siteName', 'termsOfService'];
+    var requestParams = [ 'backgroundColor', 'privacyPolicy', 'siteLogo', 'siteName', 'termsOfService' ];
 
     // takes the options, loops through the requestParams, sets any passed in and returns it
     function makeRequestParams(opts) {
@@ -185,6 +185,7 @@
                 console.log('oncancel(): entry');
                 // this request was cancelled so let's tidy up
                 showLoggedOut();
+                opts.onCancel();
             }
 
             function onlogout() {
@@ -285,7 +286,8 @@
         logoutUrl              : '/logout',
 
         // events you can listen on so you can do other things
-        onLoading              : function() {}
+        onLoading              : function() {},
+        onCancel               : function() {}
     };
 
     // defaults - classic
