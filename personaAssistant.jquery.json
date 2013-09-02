@@ -19,8 +19,10 @@
         "name" : "Andrew Chilton",
         "url" : "https://github.com/chilts/jquery.persona-assistant.js/"
     },
-    "licenses" : {
-        "type" : "MIT",
-        "url" : "http://chilts.mit-license.org/2013/"
-    }
+    "licenses" : [
+        {
+            "type" : "MIT",
+            "url" : "http://chilts.mit-license.org/2013/"
+        }
+    ]
 }
