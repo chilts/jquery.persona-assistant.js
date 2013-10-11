@@ -110,8 +110,8 @@
                 ev.preventDefault();
                 console.log('Clicked logout ...');
 
-                // after this is called, the onlogout() event from navigator.id.watch() will be called
-                navigator.id.logout();
+                // call our own onlogout() to do the right thing
+                onlogout();
             });
 
             // when someone clicks the 'add' button, get a new email address and add it to the server
@@ -189,6 +189,10 @@
             }
 
             function onlogout() {
+                // APPLIES TO APPLICATION MODE ONLY!!!
+                // * in classic mode, we just hit '/logout' and the page is entirely refreshed
+                // * in application mode, we hit '/logout.json' from Ajax and do all this
+
                 // A user has logged out! Here you need to tear down the session by:
                 //
                 // 1) send the user to another page (which tears down the session on the server)
@@ -237,11 +241,10 @@
             }
 
             // finally, watch what is going on
+            console.log('Calling navigator.id.watch()');
             navigator.id.watch({
-                loggedInUser : user,
                 onlogin      : onlogin,
                 match        : match,
-                onlogout     : onlogout
             });
 
             // return this for chained jQuery calls
